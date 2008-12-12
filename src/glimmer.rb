@@ -19,12 +19,13 @@ require "java"
 require File.dirname(__FILE__) + "/parent"
 
 module Glimmer
+  extend self #include also as class methods for convenience
   
   include_package 'org.eclipse.swt'
   
   @@parent_stack = []
 
-  def self.method_missing(method_symbol, *args, &block)
+  def method_missing(method_symbol, *args, &block)
     puts "method: " + method_symbol.to_s + " and args: " + args.to_s
     command_handler_chain = CommandHandlerChainFactory.chain
     return_value = command_handler_chain.handle(@@parent_stack.last, method_symbol, *args, &block)
@@ -32,20 +33,10 @@ module Glimmer
     return return_value
   end
 
-  def self.add_contents(parent, &block)
+  def add_contents(parent, &block)
     @@parent_stack.push(parent) if parent.is_a?(Parent)
     @@parent_stack.last.process_block(block) if block and @@parent_stack.last
     @@parent_stack.pop if parent.is_a?(Parent)
-  end
-
-  #added for convenience
-  
-  def method_missing(method_symbol, *args, &block)
-    Glimmer.method_missing(method_symbol, *args, &block)
-  end
-
-  def add_contents(parent, &block)
-    Glimmer.add_contents(parent, &block)
   end
 end
 

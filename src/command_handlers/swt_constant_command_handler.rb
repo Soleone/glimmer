@@ -24,7 +24,7 @@ class SwtConstantCommandHandler
   
   def do_handle(parent, command_symbol, *args, &block)
     puts 'org.eclipse.swt.SWT::' + command_symbol.to_s.upcase
-    eval 'org.eclipse.swt.SWT::' + command_symbol.to_s.upcase
+    org.eclipse.swt.SWT.const_get(command_symbol.to_s.upcase)
   end
   
 end
