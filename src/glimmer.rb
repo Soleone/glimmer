@@ -19,7 +19,10 @@ require "java"
 require File.dirname(__FILE__) + "/parent"
 
 module Glimmer
-  extend self #include also as class methods for convenience
+  # all instance methods also available as class methods for convenience
+  def self.included(base)
+    base.send(:extend, self)
+  end
   
   include_package 'org.eclipse.swt'
   
