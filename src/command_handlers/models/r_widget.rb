@@ -56,20 +56,7 @@ class RWidget
   end
   
   def method_missing(method_symbol, *args)
-    statement_to_eval = "@widget.send('set' + method_symbol.to_s.camelcase(true)"
-    statement_to_eval << expand_arguments(args)
-    statement_to_eval << ")"
-    eval statement_to_eval
-  end
-  
-  def expand_arguments(args)
-    expanded_args = ""
-    index = 0
-    args.each do
-      expanded_args << ", args[#{index}]"
-      index += 1
-    end
-    expanded_args
+    @widget.send("set#{method_symbol.to_s.camelcase(true)}", *args)
   end
   
   def self.widget_exists?(underscored_widget_name)
