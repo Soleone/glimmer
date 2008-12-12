@@ -21,57 +21,77 @@ class GlimmerEditor
   include_package 'org.eclipse.swt.FileDialog'
   include_package 'org.eclipse.swt.layout'
   include_package 'org.eclipse.jface.viewers'
-  
+
   def initialize
-    @editor_presenter = EditorPresenter.new
+    @editor_presenter = EditorPresenter.new(self)
+    build
     launch
   end
-  
-  def launch
+
+  def build
     @shell = shell {
-      layout RowLayout.new(SWT::VERTICAL)
       text "Glimmer Editor"
-      
+			layout GridLayout.new(1, true)
+
+  		tab_folder {
+			  layout_data GridData.new(GridData::FILL_BOTH)
+    		layout FillLayout.new
+
+  			tab_item {
+  				layout GridLayout.new(1, true)
+  				text "Editor"
+
+          text(multi | border| wrap| v_scroll) {
+  					layout_data GridData.new(GridData::FILL_BOTH)
+            text bind(@editor_presenter, :source_code)
+          }
+
+          composite {
+            layout FillLayout.new
+            
+            button {
+              text "&Run"
+              on_widget_selected { @editor_presenter.run }
+            }
+            button {
+              text "&Insert Header"
+              on_widget_selected { @editor_presenter.insert_header }
+            }
+            button {
+              text "&Load file"
+              #TODO: Need a file dialog to set the filename dynamically
+              on_widget_selected { @editor_presenter.load(File.dirname(__FILE__) + "/../login.rb") }
+            }
+            button {
+              text "&Save file"
+              #TODO: Need a file dialog to set the target filename
+              on_widget_selected { @editor_presenter.save }
+            }
+          }
+        }
+        tab_item {
+				  text "Settings"
+				  layout GridLayout.new(2, true)
+				  label { text "There are currenlty no settings available."}
+				}
+			}
       composite {
-        label { text ""}
-      }
-      composite {
-        layout_data RowData.new 600, 400
-        layout FillLayout.new
-        text(SWT::MULTI | SWT::BORDER | SWT::WRAP | SWT::V_SCROLL) {
-          text bind(@editor_presenter, :source_code)
-        }
-      }
-      composite {
-        layout GridLayout.new(6,false)
-        
-        button {
-          text "&Run"
-          on_widget_selected { @editor_presenter.run }
-        }
-        button {
-          text "&Insert Header"
-          on_widget_selected { @editor_presenter.insert_header }
-        }
-        button {
-          text "&Load file"
-          #TODO: Need a file dialog to set the filename dynamically
-          on_widget_selected { @editor_presenter.load(File.dirname(__FILE__) + "/../login.rb") }
-        }
-        button {
-          text "&Save file"
-          #TODO: Need a file dialog to set the target filename
-          on_widget_selected { @editor_presenter.save }
-        }
-      }
-      composite {
-        label {
+        layout GridLayout.new(1, true)
+        label() {
+          layout_data GridData.new(GridData::FILL_VERTICAL)
           text bind(@editor_presenter, :status)
         }
       }
     }
-
+  end  
+  
+  def launch
     @shell.open
+    @editor_presenter.change_status "You can edit glimmer files here and run them directly."
+  end
+  
+  def display
+    @shell.display    
   end
 end
 
