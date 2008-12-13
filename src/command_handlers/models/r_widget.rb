@@ -40,19 +40,17 @@ class RWidget
   }
   
   def initialize(underscored_widget_name, parent, style, &contents)
-    style = default_style(underscored_widget_name) unless style
+    style ||= default_style(underscored_widget_name)
     @widget = eval underscored_widget_name.to_s.camelcase(true) + '.new(parent, style)'
     @@default_initializers[underscored_widget_name].call(@widget) if @@default_initializers[underscored_widget_name]
   end
   
   def default_style(underscored_widget_name)
-    style = @@default_styles[underscored_widget_name] if @@default_styles[underscored_widget_name]
-    style = SWT::NONE unless style
-    style
+    @@default_styles[underscored_widget_name] || SWT::NONE
   end
   
   def respond_to?(method_symbol, *args)
-    @widget.respond_to?("set" + method_symbol.to_s.camelcase(true), args)
+    @widget.respond_to?("set#{method_symbol.to_s.camelcase(true)}", args) || super
   end
   
   def method_missing(method_symbol, *args)
